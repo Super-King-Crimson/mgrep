@@ -148,3 +148,8 @@ It's not as cool as Bust";
 //Finally, let's write to stderr (standard error) instead of using println, 
 //for when we want successful program runs to write to a file but errors to display in the console
 //We'll put our errors in output.txt
+
+//We can redirect stdout (standard output) to a file with >
+//cargo run > output.txt (note we don't have arguments, so this will error)
+
+//Hey, remember how main handles all of our errors? That makes this really easy
