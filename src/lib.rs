@@ -1,14 +1,5 @@
 use std::{fs, error::Error, env};
 
-//Wait, all parse_config does is make a Config
-//Let's just impl it!
-#[allow(unused)]
-pub struct Config {
-    pub query: String,
-    pub path_to_file: String,
-    pub ignore_case: bool,
-}
-
 //ok refactor time!
 #[allow(unused)]
 pub fn parse_config(args: &[String]) -> /* (&str, &str) */ Config {
@@ -16,33 +7,56 @@ pub fn parse_config(args: &[String]) -> /* (&str, &str) */ Config {
     // let query = &args[1];
     // let path_to_file = &args[2];
 
+    // (query, path_to_file)
+    //Why are we returning a tuple, then immediately breaking the tuple up?
+    //Also, the configs are a bunch of settings, so probably we should group them as one struct
+
     //We have to clone, otherwise we're taking ownership through a borrow
     //Cloning has a runtime cost, but it's very simple 
     let query = args[1].clone();
     let path_to_file = args[2].clone();
 
-    
-    //Alrighy t 
 
-
+    //OK done
     Config { query, path_to_file, ignore_case: false }
+    
+}
+//Wait, all parse_config does is make a Config
+//Let's just impl it into the struct itself!
 
-    // (query, path_to_file)
-    //Why are we returning a tuple, then immediately breaking the tuple up?
-    //Also, the configs are a bunch of settings, so probably we should group them as one struct
+
+pub struct Config {
+    pub query: String,
+    pub path_to_file: String,
+    pub ignore_case: bool,
 }
 
-
-
 impl Config {
-    pub fn build(args: &[String]) -> Result<Config, &'static str> {
+    //We can refactor with iterators to remove this clone
+    //Instead of accepting a borrowed String slice, we can pass an owned Iterator so we can take ownership
+    pub fn build<T: Iterator<Item = String>>(mut args: T) -> Result<Config, &'static str> {
         //And let's add an error message!
-        if args.len() < 3 {
-            return Err("Not enough arguments: Did you forget to include the path to file and/or string to look for?");
-        }
+        // if args.len() < 3 {
+            // return Err("Not enough arguments: Did you forget to include the path to file and/or string to look for?");
+        // }
 
-        let query = args[1].clone();
-        let path_to_file = args[2].clone();
+
+        // let query = args[1].clone();
+        // let path_to_file = args[2].clone();
+
+        // 
+        args.next();
+
+        let query = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a query string"),
+        };
+
+        let path_to_file = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a file path"),
+        };
+
 
         //We don't care abt the value of IGNORE_CASE, just that it got a value (not unset/false)
         let ignore_case = env::var("IGNORE_CASE").is_ok();
@@ -73,35 +87,40 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>>{
 //By the way, this is good, but not the best: it doesn't take full advantage of iterators
 //Come back after Chapter 13 to try and refactor this!
 fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    let mut matching_lines = vec![];
+    //We're back after Chapter 13. Let's refactor it!
+    // let mut matching_lines = vec![];
 
-    for line in contents.lines() {
-        if line.contains(query) {
-            matching_lines.push(line);
-        }
-    }
+    // for line in contents.lines() {
+    //     if line.contains(query) {
+    //         matching_lines.push(line);
+    //     }
+    // }
 
-    matching_lines
+    // matching_lines
+
+    //Instead of using an iterator, we use an iterator adaptor and collect it
+    contents.lines().filter(|line| line.contains(query)).collect()
 }   
 
 fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
     //to_lowercase returns a new String
-    let query = query.to_lowercase();
+    // let query = query.to_lowercase();
     
-    let mut matching_lines = vec![];
+    // let mut matching_lines = vec![];
 
-    for line in contents.lines() {
-        if line.to_lowercase().contains(&query) {
-            matching_lines.push(line);
-        }
-    }
+    // for line in contents.lines() {
+    //     if line.to_lowercase().contains(&query) {
+    //         matching_lines.push(line);
+    //     }
+    // }
 
-    matching_lines
+    // matching_lines
+
+    contents.lines().filter(|line| line.to_lowercase().contains(&query.to_lowercase())).collect()
 }   
 
 //Alright now that everything's in lib let's just use it from now on
 //Ok tests time!
-
 #[cfg(test)]
 mod tests {
     use super::*;

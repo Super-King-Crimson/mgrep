@@ -5,7 +5,8 @@ use mgrep::Config; //must preface with mgrep, lib exposes functionality
 
 fn main() {
     //collect to turn it into a collection with all the args
-    let args: Vec<String> = env::args().collect();
+    //[[ REFACTOR 1 ]]
+    // let args: Vec<String> = env::args().collect();
     // dbg!(&args);
     //If your args don' Unicode values, you have to use std::env::args_os, which returns an OsString (check docs)
     
@@ -24,7 +25,11 @@ fn main() {
     // let configs = parse_config(&args);
 
     // [[ REFACTOR 2 ]]
-    let config = Config::build(&args).unwrap_or_else(|err| {
+    // let config = Config::build(&args).unwrap_or_else(|err| {
+    
+    //[[ REFACTOR 3 ]]
+    //env::args returns an iterator! Now we're returning ownership of the iterator
+    let config = Config::build(env::args()).unwrap_or_else(|err| {
         // println!("Problem parsing arguments: {err}");
 
         //[[ FINAL REFACTOR ]]
@@ -44,7 +49,7 @@ fn main() {
     // println!("Contents of file: \n------------------------\n{}\n------------------------", contents);
     
     //[[ POST REFACTOR ]]
-    //Use if let instead of unwrap because run isn't supposed to return anything important (just a unit)
+    //Use if let instead of unwrap()/expect() because run isn't supposed to return anything important (just a unit)
     if let Err(e) = mgrep::run(config) {
         eprintln!("Application error: {e}");
         process::exit(1);
@@ -84,3 +89,13 @@ fn main() {
 }
 
 //so a bunch of stuff got moved into lib.rs
+
+/*
+*
+*
+*   COME BACK AFTER READING LESSONS 13.1 AND 13.2
+*
+*
+*/
+
+//This project can be improved with iterators (check lib)
