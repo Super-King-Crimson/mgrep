@@ -2,6 +2,8 @@
 name = "minigrepskc"
 version = "0.1.0"
 edition = "2021"
+description = "SuperKingCrimson's notes for Chapter 12 of the Brown version of the Rust book, making your own CLI"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
