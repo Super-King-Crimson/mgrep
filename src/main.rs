@@ -1,5 +1,6 @@
 //First we need to make this accept CLI arguments
 //We need std::env::args function, which returns an iterator of args passed to the function
+pub use minigrepskc as mgrep;
 use std::{env, process};
 use mgrep::Config; //must preface with mgrep, lib exposes functionality
 
