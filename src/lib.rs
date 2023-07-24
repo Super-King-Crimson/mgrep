@@ -44,7 +44,7 @@ impl Config {
         // let query = args[1].clone();
         // let path_to_file = args[2].clone();
 
-        // 
+        //skipping first argument because it's the place the file was called from
         args.next();
 
         let query = match args.next() {
@@ -98,10 +98,11 @@ fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
 
     // matching_lines
 
-    //Instead of using an iterator, we use an iterator adaptor and collect it
+    //Instead of manually iterating, we use an iterator adaptor and collect it
     contents.lines().filter(|line| line.contains(query)).collect()
 }   
 
+//and refactor this too
 fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
     //to_lowercase returns a new String
     // let query = query.to_lowercase();

@@ -12,8 +12,8 @@ fn main() {
     //If your args don' Unicode values, you have to use std::env::args_os, which returns an OsString (check docs)
     
     //By the way you pass args like this:
-    //--cargo run -- arg1 arg2... arg_n
-    
+        //cargo run -- arg1 arg2... arg_n
+
     //Also the first arg is always the file path, this is useful apparently???
 
     // [[ PRE REFACTOR ]]
@@ -37,6 +37,8 @@ fn main() {
         //Yay, we're printing to stderr now!
         eprintln!("Problem parsing arguments: {err}");
         //Now errors won't go to some random file we expect to have successful data on
+        //oh by the way you can print outputs to file with:
+            //cargo run -- query file_path > output_file
 
         //this exits program immediately and returns exit code (not 0, meaning not good)
         process::exit(1);
